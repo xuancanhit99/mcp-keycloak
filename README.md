@@ -137,8 +137,10 @@ TRANSPORT=http python -m src.main
 # Run HTTP mode on a custom port
 TRANSPORT=http PORT=8080 python -m src.main
 
-# Run HTTP mode with authentication
-TRANSPORT=http MCP_AUTH_TOKEN=your-secret-token python -m src.main
+# Or use the convenience script:
+./scripts/run_server.sh         # stdio mode (default)
+./scripts/run_server.sh http    # HTTP mode
+PORT=8080 ./scripts/run_server.sh http  # HTTP mode on custom port
 ```
 
 When using HTTP transport, the server will be accessible at `http://127.0.0.1:8000/mcp/` (or your custom PORT).
@@ -194,24 +196,15 @@ The HTTP transport implements all MCP specification security requirements:
 - Binds to `127.0.0.1` only to prevent network-based attacks
 - Follows MCP specification security recommendations
 
-**✅ Authentication Support (RECOMMENDED)**
-- Optional bearer token authentication via `MCP_AUTH_TOKEN` environment variable
-- If enabled, all requests must include `Authorization: Bearer <token>` header
-
-Example authenticated request:
-```bash
-curl -X POST http://127.0.0.1:8000/mcp/ \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer your-secret-token" \
-  -H "Accept: application/json, text/event-stream" \
-  -d '{"jsonrpc": "2.0", "method": "list_tools", "id": 1}'
-```
+**✅ No Authentication Required**
+- The server runs without authentication requirements for simplified local development
+- Suitable for localhost usage and trusted environments
 
 For production deployments, additional considerations:
 - Use HTTPS with proper certificates
 - Deploy behind a reverse proxy (nginx, Apache)
 - Set appropriate firewall rules
-- Use strong, randomly generated authentication tokens
+- Implement authentication at the reverse proxy level if needed
 
 ### Integration Examples
 
