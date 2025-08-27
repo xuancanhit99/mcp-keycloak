@@ -1,6 +1,6 @@
 [project]
 name = "mcp-keycloak"
-version = "1.1.0"
+version = "1.2.0"
 description = "MCP server for Keycloak administration"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -8,10 +8,12 @@ dependencies = [
     "python-dotenv>=1.0.0",
     "httpx>=0.28.1",
     "mcp[cli]>=1.12.3",
+    "uvicorn>=0.24.0",
+    "starlette>=0.27.0",
 ]
 
 [project.scripts]
-mcp-keycloak = "mcp_keycloak.__main__:main"
+mcp-keycloak = "mcp_keycloak.main:main"
 
 [build-system]
 requires = ["hatchling"]

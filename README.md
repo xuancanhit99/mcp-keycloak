@@ -125,10 +125,93 @@ Complete authentication flow control:
 
 ### Running the Server
 
-Start the MCP server directly:
+The server supports both stdio (default) and HTTP transports. The smithery.yaml configuration file enables deployment on the Smithery platform and automatic installation via Smithery CLI:
+
 ```bash
+# Run in stdio mode (default, for local CLI tools)
 python -m src.main
+
+# Run in HTTP mode with streamable HTTP transport
+TRANSPORT=http python -m src.main
+
+# Run HTTP mode on a custom port
+TRANSPORT=http PORT=8080 python -m src.main
+
+# Run HTTP mode with authentication
+TRANSPORT=http MCP_AUTH_TOKEN=your-secret-token python -m src.main
 ```
+
+When using HTTP transport, the server will be accessible at `http://127.0.0.1:8000/mcp/` (or your custom PORT).
+
+### HTTP Transport
+
+The Keycloak MCP Server supports HTTP transport mode, which offers several advantages:
+
+- **Network Accessibility**: Access the server from any machine on your network
+- **Multiple Clients**: Support concurrent connections from multiple AI clients
+- **Integration Flexibility**: Easy integration with web applications and APIs
+- **Load Balancing**: Deploy behind a reverse proxy for scalability
+
+#### HTTP Protocol Details
+
+The HTTP transport follows the MCP specification for Streamable HTTP. FastMCP automatically handles all protocol requirements:
+
+- **Endpoint**: All communication happens through `/mcp/` endpoint
+- **Request Method**: POST requests with JSON-RPC 2.0 messages
+- **Content Types**: 
+  - Server returns `Content-Type: application/json` for single responses
+  - Server returns `Content-Type: text/event-stream` for streaming responses
+- **Accept Headers**: Clients must include `Accept: application/json, text/event-stream`
+- **Message Format**: All messages use JSON-RPC 2.0 format, UTF-8 encoded
+
+FastMCP automatically determines whether to return a single JSON response or an SSE stream based on the request type and whether the response needs streaming capabilities.
+
+#### Connecting to HTTP Server
+
+When running in HTTP mode, clients can connect to:
+```
+http://127.0.0.1:8000/mcp/
+```
+
+Example client request:
+```bash
+curl -X POST http://localhost:8000/mcp/ \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -d '{"jsonrpc": "2.0", "method": "list_tools", "id": 1}'
+```
+
+#### Security Implementation
+
+The HTTP transport implements all MCP specification security requirements:
+
+**✅ Origin Header Validation (REQUIRED)**
+- Automatically validates Origin headers to prevent DNS rebinding attacks
+- Only allows connections from `localhost` and `127.0.0.1` origins
+- Blocks unauthorized cross-origin requests
+
+**✅ Localhost Binding (RECOMMENDED)**
+- Binds to `127.0.0.1` only to prevent network-based attacks
+- Follows MCP specification security recommendations
+
+**✅ Authentication Support (RECOMMENDED)**
+- Optional bearer token authentication via `MCP_AUTH_TOKEN` environment variable
+- If enabled, all requests must include `Authorization: Bearer <token>` header
+
+Example authenticated request:
+```bash
+curl -X POST http://127.0.0.1:8000/mcp/ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your-secret-token" \
+  -H "Accept: application/json, text/event-stream" \
+  -d '{"jsonrpc": "2.0", "method": "list_tools", "id": 1}'
+```
+
+For production deployments, additional considerations:
+- Use HTTPS with proper certificates
+- Deploy behind a reverse proxy (nginx, Apache)
+- Set appropriate firewall rules
+- Use strong, randomly generated authentication tokens
 
 ### Integration Examples
 
