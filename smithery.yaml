@@ -1,11 +1,11 @@
 # Smithery configuration file: https://smithery.ai/docs/build/project-config
 
+runtime: "container"
+build:
+  dockerfile: "Dockerfile"
+  dockerBuildPath: "."
 startCommand:
-  type: stdio
-  commandFunction:
-    # A JS function that produces the CLI command based on the given config to start the MCP on stdio.
-    |-
-    (config) => ({ command: 'mcp-keycloak', args: [], env: { SERVER_URL: config.serverUrl, USERNAME: config.username, PASSWORD: config.password, REALM_NAME: config.realmName, ...(config.clientId ? { CLIENT_ID: config.clientId } : {}), ...(config.clientSecret ? { CLIENT_SECRET: config.clientSecret } : {}) } })
+  type: http
   configSchema:
     # JSON Schema defining the configuration options for the MCP.
     type: object
@@ -25,7 +25,8 @@ startCommand:
         description: Admin password for Keycloak
       realmName:
         type: string
-        description: Keycloak realm name
+        description: Keycloak realm name (default: master)
+        default: master
       clientId:
         type: string
         description: Optional OAuth2 client ID
