@@ -14,14 +14,6 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
 from .common.server import mcp
 
-# Configure logging
-logging.basicConfig(
-    level=os.getenv("LOG_LEVEL", "INFO"),
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[logging.StreamHandler(sys.stderr)],
-)
-logger = logging.getLogger(__name__)
-
 # Import all tool modules to register them with the MCP server
 from . import tools  # noqa: F401
 from .tools import user_tools  # noqa: F401
@@ -29,6 +21,14 @@ from .tools import client_tools  # noqa: F401
 from .tools import realm_tools  # noqa: F401
 from .tools import role_tools  # noqa: F401
 from .tools import group_tools  # noqa: F401
+
+# Configure logging
+logging.basicConfig(
+    level=os.getenv("LOG_LEVEL", "INFO"),
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.StreamHandler(sys.stderr)],
+)
+logger = logging.getLogger(__name__)
 
 
 class OriginValidationMiddleware(BaseHTTPMiddleware):
