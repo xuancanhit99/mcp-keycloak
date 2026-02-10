@@ -27,7 +27,7 @@ class KeycloakClient:
     async def _get_token(self) -> str:
         """Get access token using username and password"""
         # Try new URL structure first, then fall back to old one
-        token_url = f"{self.server_url}/auth/realms/{self.realm_name}/protocol/openid-connect/token"
+        token_url = f"{self.server_url}/realms/{self.realm_name}/protocol/openid-connect/token"
 
         data = {
             "grant_type": "password",
@@ -67,11 +67,11 @@ class KeycloakClient:
     ) -> Any:
         """Make authenticated request to Keycloak API"""
         if skip_realm:
-            url = f"{self.server_url}/auth/admin{endpoint}"
+            url = f"{self.server_url}/admin{endpoint}"
         else:
             # Use provided realm or fall back to configured realm
             target_realm = realm if realm is not None else self.realm_name
-            url = f"{self.server_url}/auth/admin/realms/{target_realm}{endpoint}"
+            url = f"{self.server_url}/admin/realms/{target_realm}{endpoint}"
 
         try:
             client = await self._ensure_client()
