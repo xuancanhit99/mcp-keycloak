@@ -4,6 +4,7 @@ from . import client_tools
 from . import realm_tools
 from . import role_tools
 from . import group_tools
+from . import authentication_management_tools
 
 __all__ = [
     "KeycloakClient",
@@ -12,4 +13,5 @@ __all__ = [
     "realm_tools",
     "role_tools",
     "group_tools",
+    "authentication_management_tools",
 ]
